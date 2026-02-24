@@ -1,0 +1,10 @@
+{
+  "applicationName": "dev-codedeploy",
+  "deploymentGroupName": "dev-dg",
+  "revision": {
+    "revisionType": "AppSpecContent",
+    "appSpecContent": {
+      "content": "{\"version\":1,\"Resources\":[{\"TargetService\":{\"Type\":\"AWS::ECS::Service\",\"Properties\":{\"TaskDefinition\":\"arn:aws:ecs:us-east-1:312504613160:task-definition/dev-strapi:2\",\"LoadBalancerInfo\":{\"ContainerName\":\"strapi\",\"ContainerPort\":1337}}}}]}"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+crash.log
+
+# env files
+.env
+
+# Mac
+.DS_Store
+
+# node
+node_modules
+
+# docker
+*.log
