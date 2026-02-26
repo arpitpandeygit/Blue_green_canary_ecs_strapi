@@ -1,0 +1,50 @@
+name: Deploy to ECS
+
+on:
+  workflow_run:
+    workflows: ["Build & Push Image"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Get task definition ARN
+        id: taskdef
+        run: |
+          TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition dev-strapi \
+            --query "taskDefinition.taskDefinitionArn" \
+            --output text)
+          echo "task_def=$TASK_DEF" >> $GITHUB_OUTPUT
+
+      - name: Create AppSpec revision
+        run: |
+          cat > revision.json <<EOF
+          {
+            "applicationName": "dev-codedeploy",
+            "deploymentGroupName": "dev-dg",
+            "revision": {
+              "revisionType": "AppSpecContent",
+              "appSpecContent": {
+                "content": "{\"version\":1,\"Resources\":[{\"TargetService\":{\"Type\":\"AWS::ECS::Service\",\"Properties\":{\"TaskDefinition\":\"${{ steps.taskdef.outputs.task_def }}\",\"LoadBalancerInfo\":{\"ContainerName\":\"strapi\",\"ContainerPort\":1337}}}}]}"
+              }
+            }
+          }
+          EOF
+
+      - name: Deploy
+        run: |
+          aws deploy create-deployment \
+          --cli-input-json file://revision.json
