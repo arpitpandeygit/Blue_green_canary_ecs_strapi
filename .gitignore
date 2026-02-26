@@ -1,17 +1,29 @@
 # Terraform
 .terraform/
 *.tfstate
-*.tfstate.backup
+*.tfstate.*
 crash.log
+override.tf
+override.tf.json
+terraform.tfvars
 
-# env files
-.env
-
-# Mac
+# macOS
 .DS_Store
 
-# node
-node_modules
+# Node
+node_modules/
+dist/
+build/
 
-# docker
+# Logs
 *.log
+
+# Env
+.env
+
+# Docker
+*.tar
+
+# IDE
+.vscode/
+.idea/
